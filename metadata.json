@@ -1,0 +1,6 @@
+{
+  "name": "Modarnet Rental & Services",
+  "description": "An inventory management and rental platform allowing users to submit rental or purchase requests and admins to manage products, approve requests, and track active rentals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
