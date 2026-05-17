@@ -117,8 +117,8 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Orange Banner for Admin */}
-      <div className="bg-orange-500 rounded-xl p-4 shadow-sm border border-orange-600 flex items-center justify-between text-white">
+      {/* Banner for Admin */}
+      <div className="bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-950 flex items-center justify-between text-white">
         <div>
           <div className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-0.5">Welcome Back</div>
           <div className="text-xl font-black tracking-tight uppercase">{profileName || "System Administrator"}</div>
