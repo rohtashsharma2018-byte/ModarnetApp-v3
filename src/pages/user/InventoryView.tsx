@@ -51,10 +51,11 @@ export default function InventoryView() {
     }
 
     // Exporting only user-visible columns (excluding Total Price and Internal IDs)
-    const headers = ["Product Model", "Description", "Category", "Catalogue URL", "Sell Price", "Price / Day", "Stock Status"];
+    const headers = ["Product Code", "Product Model", "Description", "Category", "Catalogue URL", "Sell Price", "Price / Day", "Stock Status"];
     const csvContent = [
       headers.join(","),
       ...laptops.map(l => [
+        `"${(l.product_code || '').replace(/"/g, '""')}"`,
         `"${l.name.replace(/"/g, '""')}"`,
         `"${(l.description || '').replace(/"/g, '""')}"`,
         `"${(l.category || '').replace(/"/g, '""')}"`,
@@ -121,7 +122,8 @@ export default function InventoryView() {
             <thead className="bg-slate-50 text-slate-500 border-b border-slate-100">
               <tr>
                 <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Img</th>
-                <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Catalogue</th>
+                <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider text-center tracking-tight">Code</th>
+                <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider text-center">Catalogue</th>
                 <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Product Model</th>
                 <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Category</th>
                 <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Purchase Price</th>
@@ -132,7 +134,7 @@ export default function InventoryView() {
             <tbody className="divide-y divide-slate-100">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-xs text-slate-400">Loading live inventory...</td>
+                  <td colSpan={8} className="px-4 py-8 text-center text-xs text-slate-400">Loading live inventory...</td>
                 </tr>
               ) : laptops.map(l => (
                 <tr key={l.id} className="hover:bg-slate-50/50 transition-colors">
@@ -153,7 +155,12 @@ export default function InventoryView() {
                       </div>
                     )}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 text-center">
+                    <span className="font-mono text-[9px] font-black text-blue-600 bg-blue-50 px-1 py-0.5 rounded border border-blue-100">
+                      {l.product_code || '---'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
                     {l.catalogue_url ? (
                       <a 
                         href={l.catalogue_url} 
@@ -192,7 +199,7 @@ export default function InventoryView() {
               ))}
               {!loading && laptops.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-xs text-slate-500 italic">No inventory available at the moment.</td>
+                  <td colSpan={8} className="px-4 py-12 text-center text-xs text-slate-500 italic">No inventory available at the moment.</td>
                 </tr>
               )}
             </tbody>

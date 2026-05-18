@@ -26,6 +26,7 @@ export default function Inventory() {
   const [thumbnailUrl, setThumbnailUrl] = useState<string>("");
   const [pendingThumbnailIndex, setPendingThumbnailIndex] = useState<number | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [nextProductCode, setNextProductCode] = useState("");
   const [fullViewImage, setFullViewImage] = useState<string | null>(null);
   const [currentGallery, setCurrentGallery] = useState<string[]>([]);
   
@@ -57,6 +58,17 @@ export default function Inventory() {
       subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (!editingLaptop && isDialogOpen) {
+      const year = new Date().getFullYear();
+      const prefix = `MCN-${year}-`;
+      
+      // Generate a random 4-digit number (1000-9999)
+      const randomNum = Math.floor(1000 + Math.random() * 9000);
+      setNextProductCode(`${prefix}${randomNum}`);
+    }
+  }, [isDialogOpen, editingLaptop]);
 
   const fetchLaptops = async () => {
     const { data, error } = await supabase
@@ -141,7 +153,8 @@ export default function Inventory() {
         sell_price: data.sell_price ? Number(data.sell_price) : 0,
         stock: Number(data.stock),
         image_url: finalThumbnail,
-        image_urls: allUrls
+        image_urls: allUrls,
+        product_code: editingLaptop ? editingLaptop.product_code : nextProductCode
       };
 
       if (editingLaptop) {
@@ -193,15 +206,63 @@ export default function Inventory() {
     setIsDialogOpen(true);
   };
 
+  const checkIfCanDelete = async (id: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("rental_requests")
+        .select("id")
+        .eq("laptop_id", id)
+        .in("status", ["active", "approved", "overdue"]);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        toast.error("Deletion Blocked", {
+          description: "This product cannot be deleted because it is currently in 'Active', 'Approved' or 'Overdue' rentals. Please complete or cancel the rentals before deleting this item.",
+          duration: 5000
+        });
+        return;
+      }
+
+      setDeleteConfirmId(id);
+    } catch (e: any) {
+      toast.error("Error Checking Rental Status: " + e.message);
+    }
+  };
+
   const handleDelete = async (id: string) => {
     try {
+      // Get the laptop to find image URLs before deletion
+      const laptopToDelete = laptops.find(l => l.id === id);
+      const urlsToDelete = laptopToDelete?.image_urls || (laptopToDelete?.image_url ? [laptopToDelete.image_url] : []);
+      
+      // Delete images from storage if they exist
+      if (urlsToDelete.length > 0) {
+        const pathsToDelete = urlsToDelete
+          .map(url => {
+            const parts = url.split('/public/product-images/');
+            return parts.length > 1 ? parts[1] : null;
+          })
+          .filter(path => path !== null) as string[];
+
+        if (pathsToDelete.length > 0) {
+          const { error: storageError } = await supabase.storage
+            .from('product-images')
+            .remove(pathsToDelete);
+            
+          if (storageError) {
+            console.error("Storage deletion error:", storageError);
+          }
+        }
+      }
+
       const { error } = await supabase
         .from("laptops")
         .delete()
         .eq("id", id);
       
       if (error) throw error;
-      toast.success("Product deleted");
+      toast.success("Product and associated images deleted");
       fetchLaptops();
     } catch(e: any) {
       toast.error("Error deleting: " + e.message);
@@ -214,10 +275,11 @@ export default function Inventory() {
       return;
     }
 
-    const headers = ["Product Model", "Description", "Category", "Catalogue URL", "Total Price", "Sell Price", "Price / Day", "Stock"];
+    const headers = ["Product Code", "Product Model", "Description", "Category", "Catalogue URL", "Total Price", "Sell Price", "Price / Day", "Stock"];
     const csvContent = [
       headers.join(","),
       ...laptops.map(l => [
+        `"${(l.product_code || '').replace(/"/g, '""')}"`,
         `"${l.name.replace(/"/g, '""')}"`,
         `"${(l.description || '').replace(/"/g, '""')}"`,
         `"${(l.category || '').replace(/"/g, '""')}"`,
@@ -310,7 +372,15 @@ export default function Inventory() {
             <h4 className="font-bold text-sm">{editingLaptop ? "Edit Product" : "Add New Product"}</h4>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="lg:col-span-1">
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Product Code</label>
+                  <input 
+                    value={editingLaptop ? editingLaptop.product_code : nextProductCode} 
+                    disabled 
+                    className="w-full rounded border border-slate-200 bg-slate-100 px-3 py-1.5 text-sm font-bold text-blue-600" 
+                  />
+                </div>
+                <div className="lg:col-span-2">
                   <label className="block text-xs font-medium text-slate-700 mb-1">Name</label>
                   <input {...register("name", { required: true })} className="w-full rounded border border-slate-300 px-3 py-1.5 text-sm" />
                 </div>
@@ -429,7 +499,8 @@ export default function Inventory() {
             <thead className="bg-slate-50 text-slate-500 border-b border-slate-100">
               <tr>
                 <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Img</th>
-                <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Catalogue</th>
+                <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Product Code</th>
+                <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider text-center">Catalogue</th>
                 <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Product Model</th>
                 <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Category</th>
                 <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Total Price</th>
@@ -460,6 +531,11 @@ export default function Inventory() {
                     )}
                   </td>
                   <td className="px-4 py-3">
+                    <span className="font-mono text-[10px] font-black text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">
+                      {l.product_code || 'N/A'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
                     {l.catalogue_url ? (
                       <div className="flex flex-col gap-1">
                         <a 
@@ -495,13 +571,13 @@ export default function Inventory() {
                   </td>
                   <td className="px-4 py-3 text-right space-x-1">
                     <button onClick={() => handleEdit(l)} className="px-2 py-1 bg-white text-slate-600 border border-slate-200 rounded text-xs font-bold hover:bg-slate-50">Edit</button>
-                    <button onClick={() => setDeleteConfirmId(l.id)} className="px-2 py-1 bg-white text-rose-600 border border-slate-200 rounded text-xs font-bold hover:bg-rose-50">Del</button>
+                    <button onClick={() => checkIfCanDelete(l.id)} className="px-2 py-1 bg-white text-rose-600 border border-slate-200 rounded text-xs font-bold hover:bg-rose-50">Del</button>
                   </td>
                 </tr>
               ))}
               {laptops.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-4 py-6 text-center text-xs text-slate-500">No inventory found.</td>
+                  <td colSpan={10} className="px-4 py-6 text-center text-xs text-slate-500">No inventory found.</td>
                 </tr>
               )}
             </tbody>

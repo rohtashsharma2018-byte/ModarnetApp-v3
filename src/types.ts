@@ -20,6 +20,7 @@ export interface Laptop {
   stock: number;
   image_url: string;
   image_urls?: string[];
+  product_code?: string;
   created_at: string;
   updated_at: string;
 }
