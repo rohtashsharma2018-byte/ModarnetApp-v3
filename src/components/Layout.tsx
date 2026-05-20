@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { supabase } from "../lib/supabase";
 import { Button } from "./ui/button";
-import { LogOut, Monitor, User as UserIcon, Calendar, History, Package, ClipboardList, Clock, PhoneCall, ShoppingCart, Settings } from "lucide-react";
+import { LogOut, Monitor, User as UserIcon, Calendar, History, Package, ClipboardList, Clock, PhoneCall, ShoppingCart, Settings, DollarSign } from "lucide-react";
 
 export const Layout: React.FC = () => {
   const { user, role } = useAuth();
@@ -66,6 +66,7 @@ export const Layout: React.FC = () => {
     { to: "/admin/active", label: "Active Rentals", icon: <Monitor className="w-4 h-4" /> },
     { to: "/admin/history", label: "Requests History", icon: <History className="w-4 h-4" /> },
     { to: "/admin/users", label: "User Management", icon: <UserIcon className="w-4 h-4" /> },
+    { to: "/admin/payouts", label: "Payouts", icon: <DollarSign className="w-4 h-4" /> },
     { to: "/admin/inventory", label: "Inventory Mgmt", icon: <Package className="w-4 h-4" /> },
     { to: "/admin/settings", label: "Profile Settings", icon: <Settings className="w-4 h-4" /> },
   ];
@@ -77,7 +78,7 @@ export const Layout: React.FC = () => {
       <header className="md:hidden bg-slate-900 border-b border-slate-800 p-4 shrink-0 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-xs font-bold text-white">M</div>
-          <span className="text-xl font-bold text-white tracking-tight">Modarnet <span className="text-blue-500">Rental</span></span>
+          <span className="text-xl font-bold text-white tracking-tight">Modarnet</span>
         </div>
         {user && (
           <Button variant="ghost" size="sm" onClick={() => supabase.auth.signOut()} className="text-slate-300 hover:text-white">
@@ -92,7 +93,7 @@ export const Layout: React.FC = () => {
             <div className="p-6 hidden md:block">
               <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-xs">M</div>
-                Modarnet <span className="text-blue-500">Rental</span>
+                Modarnet
               </h1>
             </div>
             <nav className="flex-1 px-4 space-y-1 overflow-x-auto md:overflow-y-auto flex flex-row md:flex-col py-2 md:py-0">

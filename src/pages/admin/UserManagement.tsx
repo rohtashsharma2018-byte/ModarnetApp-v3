@@ -90,7 +90,7 @@ export default function UserManagement() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm transition-all duration-300">
         <div className="flex-1">
           <h2 className="text-xl font-bold tracking-tight text-slate-900">User Management</h2>
-          <p className="text-sm text-slate-500">Manage user accounts, roles, access, and permissions.</p>
+          <p className="text-sm text-slate-500">Show active users with roles</p>
         </div>
         
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">

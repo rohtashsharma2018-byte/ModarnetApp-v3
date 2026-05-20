@@ -6,6 +6,9 @@ export interface UserProfile {
   phone: string;
   address: string;
   created_at: string;
+  rental_incentive?: number;
+  sales_incentive?: number;
+  incentive_comments?: string;
 }
 
 export interface Laptop {

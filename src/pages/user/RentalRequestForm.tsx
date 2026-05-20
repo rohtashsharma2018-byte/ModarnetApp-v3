@@ -31,6 +31,16 @@ export default function RentalRequestForm() {
     fetchLaptops();
   }, []);
 
+  useEffect(() => {
+    if (laptops.length > 0) {
+      const params = new URLSearchParams(window.location.search);
+      const preselectedId = params.get("laptopId");
+      if (preselectedId && laptops.some(l => l.id === preselectedId)) {
+        setValue("laptopId", preselectedId);
+      }
+    }
+  }, [laptops, setValue]);
+
   const fetchLaptops = async () => {
     const { data, error } = await supabase
       .from("laptops")

@@ -19,7 +19,7 @@ export default function PurchaseRequestForm() {
   const { user } = useAuth();
   const [laptops, setLaptops] = useState<Laptop[]>([]);
   const [selectedLaptop, setSelectedLaptop] = useState<Laptop | null>(null);
-  const { register, handleSubmit, watch, reset } = useForm<FormValues>();
+  const { register, handleSubmit, watch, reset, setValue } = useForm<FormValues>();
 
   const watchLaptopId = watch("laptopId");
   const watchQuantity = watch("quantity", 1);
@@ -27,6 +27,16 @@ export default function PurchaseRequestForm() {
   useEffect(() => {
     fetchLaptops();
   }, []);
+
+  useEffect(() => {
+    if (laptops.length > 0) {
+      const params = new URLSearchParams(window.location.search);
+      const preselectedId = params.get("laptopId");
+      if (preselectedId && laptops.some(l => l.id === preselectedId)) {
+        setValue("laptopId", preselectedId);
+      }
+    }
+  }, [laptops, setValue]);
 
   const fetchLaptops = async () => {
     const { data, error } = await supabase

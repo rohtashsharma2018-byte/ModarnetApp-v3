@@ -44,7 +44,7 @@ export const SignUp: React.FC = () => {
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 text-slate-900">
       <div className="w-full max-w-sm bg-white rounded-xl shadow-sm border border-slate-200 p-8">
         <h2 className="text-2xl font-bold text-slate-800 mb-2">Create Account</h2>
-        <p className="text-slate-500 text-sm mb-6">Join Modarnet Rental & Services</p>
+        <p className="text-slate-500 text-sm mb-6">Join Modarnet & Services</p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>

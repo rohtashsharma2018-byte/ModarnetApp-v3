@@ -23,6 +23,7 @@ const ManagePurchaseRequests = React.lazy(() => import('./pages/admin/ManagePurc
 const RequestsHistory = React.lazy(() => import('./pages/admin/RequestsHistory'));
 const UserManagement = React.lazy(() => import('./pages/admin/UserManagement'));
 const ProfileSettings = React.lazy(() => import('./pages/admin/ProfileSettings'));
+const Payouts = React.lazy(() => import('./pages/admin/Payouts'));
 
 export default function App() {
   const { user, role, loading } = useAuth();
@@ -61,6 +62,7 @@ export default function App() {
                 <Route path="admin/active" element={<ActiveRentals />} />
                 <Route path="admin/history" element={<RequestsHistory />} />
                 <Route path="admin/users" element={<UserManagement />} />
+                <Route path="admin/payouts" element={<Payouts />} />
                 <Route path="admin/settings" element={<ProfileSettings />} />
                 <Route path="*" element={<Navigate to="/admin" replace />} />
               </>

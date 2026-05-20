@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../contexts/AuthContext";
-import { RentalRequest, PurchaseRequest } from "../../types";
+import { RentalRequest, PurchaseRequest, UserProfile } from "../../types";
 import { format } from "date-fns";
 
 export default function UserDashboard() {
   const { user, role } = useAuth();
   const [profileName, setProfileName] = useState<string>("");
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [requests, setRequests] = useState<RentalRequest[]>([]);
   const [purchaseRequests, setPurchaseRequests] = useState<PurchaseRequest[]>([]);
 
@@ -66,12 +67,13 @@ export default function UserDashboard() {
     if (!user) return;
     const { data } = await supabase
       .from("profiles")
-      .select("name")
+      .select("*")
       .eq("id", user.id)
       .single();
     
     if (data) {
       setProfileName(data.name || "");
+      setProfile(data as UserProfile);
     } else {
       setProfileName(user.user_metadata?.full_name || user.email?.split("@")[0] || "User");
     }
@@ -127,6 +129,51 @@ export default function UserDashboard() {
               <div className="w-1.5 h-1.5 bg-green-300 rounded-full animate-pulse"></div>
               <span className="text-[11px] font-bold uppercase tracking-widest">{role || 'User'}</span>
            </div>
+        </div>
+      </div>
+
+      {/* Accrued payout incentives display */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Rental Incentive Card */}
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 shadow-sm transition-all hover:shadow-md duration-300 flex flex-col justify-between">
+          <div>
+            <div className="text-emerald-800 text-xs font-black uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
+              Accrued Rental Incentive
+            </div>
+            <div className="text-2xl sm:text-3xl font-black text-emerald-950 tracking-tight">
+              ₹{(profile?.rental_incentive || 0).toLocaleString()}
+            </div>
+          </div>
+          <p className="text-[10px] text-emerald-600 font-bold mt-3 uppercase tracking-wider">Accrued Rental Commissions</p>
+        </div>
+
+        {/* Sales Incentive Card */}
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 shadow-sm transition-all hover:shadow-md duration-300 flex flex-col justify-between">
+          <div>
+            <div className="text-blue-800 text-xs font-black uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+              Accrued Sales Incentive
+            </div>
+            <div className="text-2xl sm:text-3xl font-black text-blue-950 tracking-tight">
+              ₹{(profile?.sales_incentive || 0).toLocaleString()}
+            </div>
+          </div>
+          <p className="text-[10px] text-blue-600 font-bold mt-3 uppercase tracking-wider">Accrued Sales Bonuses</p>
+        </div>
+
+        {/* Incentive Comments Card */}
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm transition-all hover:shadow-md duration-300 flex flex-col justify-between">
+          <div>
+            <div className="text-slate-700 text-xs font-black uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 bg-slate-400 rounded-full"></div>
+              Ledger Account Comments
+            </div>
+            <pre className="text-xs text-slate-600 font-sans italic whitespace-pre-wrap leading-relaxed line-clamp-4 overflow-y-auto" title={profile?.incentive_comments || ""}>
+              {profile?.incentive_comments || "No comments assigned to your ledger yet."}
+            </pre>
+          </div>
+          <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tight mt-3 block">Manager Remarks</span>
         </div>
       </div>
 

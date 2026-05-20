@@ -32,7 +32,7 @@ export const Login: React.FC = () => {
           <div className="mx-auto w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-6 text-white text-xl font-bold">
             M
           </div>
-          <h1 className="text-xl font-bold tracking-tight mb-2">Modarnet Rental</h1>
+          <h1 className="text-xl font-bold tracking-tight mb-2">Modarnet</h1>
           <p className="text-xs text-slate-500 mb-8 text-center">Login with your mobile number</p>
         </div>
 
