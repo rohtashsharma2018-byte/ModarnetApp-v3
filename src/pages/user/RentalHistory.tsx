@@ -3,6 +3,7 @@ import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../contexts/AuthContext";
 import { RentalRequest } from "../../types";
 import { format } from "date-fns";
+import { ResizableHeader } from "../../components/ResizableHeader";
 
 export default function RentalHistory() {
   const { user } = useAuth();
@@ -62,13 +63,13 @@ export default function RentalHistory() {
         <h3 className="font-bold text-slate-800 text-sm">Rental History</h3>
       </div>
       <div className="flex-1 overflow-x-auto">
-        <table className="w-full text-left text-sm">
+        <table className="w-full text-left text-sm table-fixed border-collapse">
           <thead className="bg-slate-50 text-slate-500 border-b border-slate-100">
             <tr>
-              <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Product Model</th>
-              <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Dates</th>
-              <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Duration</th>
-              <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Status</th>
+              <ResizableHeader label="Product Model" initialWidth={300} />
+              <ResizableHeader label="Dates" initialWidth={250} />
+              <ResizableHeader label="Duration" initialWidth={200} />
+              <ResizableHeader label="Status" initialWidth={150} />
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">

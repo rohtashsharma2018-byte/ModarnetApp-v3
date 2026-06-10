@@ -4,6 +4,7 @@ import { Laptop } from "../../types";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { Folder, Download, Image, X } from "lucide-react";
+import { ResizableHeader } from "../../components/ResizableHeader";
 
 interface LaptopForm {
   name: string;
@@ -495,19 +496,19 @@ export default function Inventory() {
         )}
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-left text-sm table-fixed border-collapse">
             <thead className="bg-slate-50 text-slate-500 border-b border-slate-100">
               <tr>
-                <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Img</th>
-                <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Product Code</th>
-                <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider text-center">Catalogue</th>
-                <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Product Model</th>
-                <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Category</th>
-                <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Total Price</th>
-                <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Sell Price</th>
-                <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Price / Day</th>
-                <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Stock</th>
-                <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider text-right">Actions</th>
+                <ResizableHeader label="Img" initialWidth={70} minWidth={40} />
+                <ResizableHeader label="Product Code" initialWidth={140} />
+                <ResizableHeader label="Catalogue" initialWidth={140} className="text-center" />
+                <ResizableHeader label="Product Model" initialWidth={350} minWidth={150} />
+                <ResizableHeader label="Category" initialWidth={140} />
+                <ResizableHeader label="Total Price" initialWidth={150} />
+                <ResizableHeader label="Sell Price" initialWidth={150} />
+                <ResizableHeader label="Price / Day" initialWidth={150} />
+                <ResizableHeader label="Stock" initialWidth={110} />
+                <ResizableHeader label="Actions" initialWidth={140} className="text-right" />
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -555,7 +556,7 @@ export default function Inventory() {
                   <td className="px-4 py-3">
                     <div className="flex flex-col">
                       <span className="font-bold text-slate-800 text-xs">{l.name}</span>
-                      <span className="text-[10px] text-slate-500 line-clamp-1">{l.description}</span>
+                      <span className="text-[10px] text-slate-500 whitespace-normal">{l.description}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3">

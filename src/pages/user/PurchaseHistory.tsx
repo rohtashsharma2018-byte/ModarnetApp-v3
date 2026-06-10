@@ -3,6 +3,7 @@ import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../contexts/AuthContext";
 import { PurchaseRequest } from "../../types";
 import { format } from "date-fns";
+import { ResizableHeader } from "../../components/ResizableHeader";
 
 export default function PurchaseHistory() {
   const { user } = useAuth();
@@ -62,13 +63,13 @@ export default function PurchaseHistory() {
         <h3 className="font-bold text-slate-800 text-sm">Purchase History</h3>
       </div>
       <div className="flex-1 overflow-x-auto">
-        <table className="w-full text-left text-sm">
+        <table className="w-full text-left text-sm table-fixed border-collapse">
           <thead className="bg-slate-50 text-slate-500 border-b border-slate-100">
             <tr>
-              <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Product Model</th>
-              <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Order Details</th>
-              <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Cost</th>
-              <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Status</th>
+              <ResizableHeader label="Product Model" initialWidth={300} />
+              <ResizableHeader label="Order Details" initialWidth={250} />
+              <ResizableHeader label="Cost" initialWidth={200} />
+              <ResizableHeader label="Status" initialWidth={150} />
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">

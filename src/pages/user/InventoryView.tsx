@@ -4,6 +4,7 @@ import { Laptop } from "../../types";
 import { toast } from "sonner";
 import { Folder, Download, Image, X, LayoutGrid, List, Calendar, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { ResizableHeader } from "../../components/ResizableHeader";
 
 export default function InventoryView() {
   const navigate = useNavigate();
@@ -151,18 +152,18 @@ export default function InventoryView() {
 
         {viewMode === "list" ? (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm table-fixed border-collapse">
               <thead className="bg-slate-50 text-slate-500 border-b border-slate-100">
                 <tr>
-                  <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Img</th>
-                  <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider text-center tracking-tight">Code</th>
-                  <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider text-center">Catalogue</th>
-                  <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Product Model</th>
-                  <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Category</th>
-                  <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Purchase Price</th>
-                  <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Rental / Day</th>
-                  <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Status</th>
-                  <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider text-right">Actions</th>
+                  <ResizableHeader label="Img" initialWidth={70} minWidth={40} />
+                  <ResizableHeader label="Code" initialWidth={120} className="text-center" />
+                  <ResizableHeader label="Catalogue" initialWidth={140} className="text-center" />
+                  <ResizableHeader label="Product Model" initialWidth={350} minWidth={150} />
+                  <ResizableHeader label="Category" initialWidth={140} />
+                  <ResizableHeader label="Purchase Price" initialWidth={160} />
+                  <ResizableHeader label="Rental / Day" initialWidth={160} />
+                  <ResizableHeader label="Status" initialWidth={130} />
+                  <ResizableHeader label="Actions" initialWidth={180} className="text-right" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -212,7 +213,7 @@ export default function InventoryView() {
                     <td className="px-4 py-3">
                       <div className="flex flex-col">
                         <span className="font-bold text-slate-800 text-xs">{l.name}</span>
-                        <span className="text-[10px] text-slate-500 line-clamp-1 italic">{l.description}</span>
+                        <span className="text-[10px] text-slate-500 italic whitespace-normal">{l.description}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
@@ -301,8 +302,8 @@ export default function InventoryView() {
                       </div>
                       
                       {/* Product Model */}
-                      <h4 className="font-bold text-slate-900 text-sm group-hover:text-blue-600 transition-colors line-clamp-1">{l.name}</h4>
-                      <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-2 italic leading-relaxed min-h-[2rem]">
+                      <h4 className="font-bold text-slate-900 text-sm group-hover:text-blue-600 transition-colors">{l.name}</h4>
+                      <p className="text-[11px] text-slate-500 mt-0.5 italic leading-relaxed min-h-[2rem] whitespace-normal">
                         {l.description || 'No description provided.'}
                       </p>
                     </div>

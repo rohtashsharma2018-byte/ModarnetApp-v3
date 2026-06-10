@@ -3,6 +3,7 @@ import { supabase } from "../../lib/supabase";
 import { PurchaseRequest } from "../../types";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { ResizableHeader } from "../../components/ResizableHeader";
 
 export default function ManagePurchaseRequests() {
   const [requests, setRequests] = useState<PurchaseRequest[]>([]);
@@ -178,14 +179,14 @@ export default function ManagePurchaseRequests() {
         <h3 className="font-bold text-slate-800 text-sm tracking-tight uppercase">New Purchase Requests</h3>
       </div>
       <div className="flex-1 overflow-x-auto text-[13px]">
-        <table className="w-full text-left">
+        <table className="w-full text-left table-fixed border-collapse">
           <thead className="bg-slate-50 text-slate-500 border-b border-slate-100 italic">
             <tr>
-              <th className="px-4 py-3 font-semibold text-[10px] uppercase tracking-widest">User Details</th>
-              <th className="px-4 py-3 font-semibold text-[10px] uppercase tracking-widest">Product Details</th>
-              <th className="px-4 py-3 font-semibold text-[10px] uppercase tracking-widest">Summary</th>
-              <th className="px-4 py-3 font-semibold text-[10px] uppercase tracking-widest">Delivery</th>
-              <th className="px-4 py-3 font-semibold text-[10px] uppercase tracking-widest text-right">Action</th>
+              <ResizableHeader label="User Details" initialWidth={250} />
+              <ResizableHeader label="Product Details" initialWidth={250} />
+              <ResizableHeader label="Summary" initialWidth={180} />
+              <ResizableHeader label="Delivery" initialWidth={200} />
+              <ResizableHeader label="Action" initialWidth={140} className="text-right" />
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -195,7 +196,7 @@ export default function ManagePurchaseRequests() {
                   <div className="font-bold text-slate-900">{req.profiles?.name || 'Customer'}</div>
                   <div className="text-[11px] text-blue-600 font-medium">{req.email}</div>
                   <div className="text-[11px] text-slate-500 mt-1">{req.phone}</div>
-                  <div className="text-[11px] text-slate-400 italic truncate w-32" title={req.address}>{req.address}</div>
+                  <div className="text-[11px] text-slate-400 italic truncate" title={req.address}>{req.address}</div>
                 </td>
                 <td className="px-4 py-3">
                   <div className="font-bold text-slate-800 uppercase text-[12px]">{req.laptop_name}</div>

@@ -3,6 +3,7 @@ import { supabase } from "../../lib/supabase";
 import { RentalRequest } from "../../types";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { ResizableHeader } from "../../components/ResizableHeader";
 
 export default function ManageRequests() {
   const [requests, setRequests] = useState<RentalRequest[]>([]);
@@ -153,14 +154,14 @@ export default function ManageRequests() {
         <h3 className="font-bold text-slate-800 text-sm">Recent Rental Requests</h3>
       </div>
       <div className="flex-1 overflow-x-auto">
-        <table className="w-full text-left text-sm">
+        <table className="w-full text-left text-sm table-fixed border-collapse">
           <thead className="bg-slate-50 text-slate-500 border-b border-slate-100">
             <tr>
-              <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">User Details</th>
-              <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Purpose</th>
-              <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Product Model</th>
-              <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Duration</th>
-              <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider text-right">Actions</th>
+              <ResizableHeader label="User Details" initialWidth={250} />
+              <ResizableHeader label="Purpose" initialWidth={300} />
+              <ResizableHeader label="Product Model" initialWidth={250} />
+              <ResizableHeader label="Duration" initialWidth={200} />
+              <ResizableHeader label="Actions" initialWidth={180} className="text-right" />
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -168,12 +169,12 @@ export default function ManageRequests() {
               <tr key={req.id} className="hover:bg-slate-50/50 transition-colors">
                 <td className="px-4 py-3">
                   <div className="text-xs font-bold text-slate-800">{req.profiles?.name || 'Unknown'}</div>
-                  <div className="text-[11px] text-blue-600 truncate w-32" title={req.email || req.profiles?.email || ''}>{req.email || req.profiles?.email || 'No email'}</div>
+                  <div className="text-[11px] text-blue-600 truncate" title={req.email || req.profiles?.email || ''}>{req.email || req.profiles?.email || 'No email'}</div>
                   <div className="text-[11px] text-slate-500 mt-0.5">{req.profiles?.phone || 'No phone'}</div>
-                  <div className="text-[11px] text-slate-500 truncate w-32" title={req.profiles?.address || ''}>{req.profiles?.address || 'No address'}</div>
+                  <div className="text-[11px] text-slate-500 truncate" title={req.profiles?.address || ''}>{req.profiles?.address || 'No address'}</div>
                 </td>
                 <td className="px-4 py-3">
-                  <div className="text-[11px] text-slate-500 truncate w-40 italic">{req.purpose}</div>
+                  <div className="text-[11px] text-slate-500 truncate italic">{req.purpose}</div>
                 </td>
                 <td className="px-4 py-3">
                   <span className="bg-slate-100 px-2 py-1 rounded border border-slate-200 text-xs font-mono">{req.laptop_name}</span>
