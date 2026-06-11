@@ -95,7 +95,11 @@ export default function UserManagement() {
         return;
       }
 
-      const response = await fetch("/api/admin/reset-password", {
+      const endpoint = import.meta.env.DEV 
+        ? "/api/admin/reset-password" 
+        : "/.netlify/functions/reset-password";
+        
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

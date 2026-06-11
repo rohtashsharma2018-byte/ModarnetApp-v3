@@ -1,11 +1,27 @@
 import { createClient } from "@supabase/supabase-js";
 
 export async function handler(event: any, context: any) {
+  // Handle CORS preflight
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+      },
+      body: "",
+    };
+  }
+
   // Only allow POST requests
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify({ error: "Method Not Allowed" }),
     };
   }
@@ -15,7 +31,7 @@ export async function handler(event: any, context: any) {
     if (!authHeader) {
       return {
         statusCode: 401,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify({ error: "Unauthorized: Missing Authorization header" }),
       };
     }
@@ -24,7 +40,7 @@ export async function handler(event: any, context: any) {
     if (!token) {
       return {
         statusCode: 401,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify({ error: "Unauthorized: Missing Bearer token" }),
       };
     }
@@ -35,7 +51,7 @@ export async function handler(event: any, context: any) {
     if (!supabaseUrl) {
       return {
         statusCode: 500,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify({ error: "Server Configuration Error: Supabase URL is missing on the server." }),
       };
     }
@@ -43,7 +59,7 @@ export async function handler(event: any, context: any) {
     if (!supabaseServiceRoleKey) {
       return {
         statusCode: 500,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify({ error: "Server Configuration Error: SUPABASE_SERVICE_ROLE_KEY is missing on the server. Please set this in your environment/secrets." }),
       };
     }
@@ -62,7 +78,7 @@ export async function handler(event: any, context: any) {
       console.error("Auth verification failed:", authError);
       return {
         statusCode: 401,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify({ error: "Unauthorized: Invalid or expired token" }),
       };
     }
@@ -78,7 +94,7 @@ export async function handler(event: any, context: any) {
       console.error("Failed to query profile:", profileError);
       return {
         statusCode: 403,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify({ error: "Forbidden: Requester profile not found or database error" }),
       };
     }
@@ -87,7 +103,7 @@ export async function handler(event: any, context: any) {
     if (profile.role !== "admin") {
       return {
         statusCode: 403,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify({ error: "Forbidden: Only administrators can perform password resets" }),
       };
     }
@@ -99,7 +115,7 @@ export async function handler(event: any, context: any) {
     if (!userId || !newPassword) {
       return {
         statusCode: 400,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify({ error: "Bad Request: Missing userId or newPassword in request body" }),
       };
     }
@@ -107,7 +123,7 @@ export async function handler(event: any, context: any) {
     if (newPassword.length < 6) {
       return {
         statusCode: 400,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify({ error: "Bad Request: Password must be at least 6 characters" }),
       };
     }
@@ -121,21 +137,21 @@ export async function handler(event: any, context: any) {
       console.error("Supabase Admin password update failed:", updateError);
       return {
         statusCode: 500,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify({ error: `Reset Failed: ${updateError.message}` }),
       };
     }
 
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify({ success: true, message: "User password updated successfully" }),
     };
   } catch (err: any) {
     console.error("Unexpected error in Netlify function reset-password:", err);
     return {
       statusCode: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify({ error: `Internal Server Error: ${err.message || err}` }),
     };
   }
