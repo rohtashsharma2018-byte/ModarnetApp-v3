@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { supabase } from "../../lib/supabase";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { Search, ShieldAlert, Shield, ShieldOff, Trash2, Plus, X, Eye, EyeOff } from "lucide-react";
+import { Search, ShieldAlert, Shield, ShieldOff, Trash2, Plus, X, Eye, EyeOff, KeyRound } from "lucide-react";
 import { UserProfile } from "../../types";
 import { Button } from "../../components/ui/button";
 
@@ -13,6 +13,13 @@ export default function UserManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // New states for the Reset Password flow
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
+  const [resetPassword, setResetPassword] = useState("");
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
@@ -64,6 +71,55 @@ export default function UserManagement() {
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to add user");
+    }
+  };
+
+  const onResetPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedUser) return;
+    if (resetPassword.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+
+    try {
+      setIsResetting(true);
+      
+      // Get the session access token
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      
+      const token = session?.access_token;
+      if (!token) {
+        toast.error("You must be logged in to perform this action");
+        return;
+      }
+
+      const response = await fetch("/api/admin/reset-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          userId: selectedUser.id,
+          newPassword: resetPassword
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to reset password");
+      }
+
+      toast.success(`Password updated successfully for ${selectedUser.name || 'User'}!`);
+      setIsResetModalOpen(false);
+      setSelectedUser(null);
+      setResetPassword("");
+    } catch (err: any) {
+      toast.error(err.message || "An unexpected error occurred");
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -211,18 +267,19 @@ export default function UserManagement() {
                 <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Joining Date</th>
                 <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">User Info</th>
                 <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider">Role & Status</th>
+                <th className="px-4 py-3 font-semibold text-[11px] uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {loading && users.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-4 py-12 text-center text-xs text-slate-500 font-bold uppercase tracking-widest">
+                  <td colSpan={4} className="px-4 py-12 text-center text-xs text-slate-500 font-bold uppercase tracking-widest">
                     Loading users...
                   </td>
                 </tr>
               ) : filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-4 py-12 text-center text-xs text-slate-500 italic font-medium">
+                  <td colSpan={4} className="px-4 py-12 text-center text-xs text-slate-500 italic font-medium">
                     No users found.
                   </td>
                 </tr>
@@ -248,6 +305,19 @@ export default function UserManagement() {
                         {u.role || 'user'}
                       </span>
                     </td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={() => {
+                          setSelectedUser(u);
+                          setIsResetModalOpen(true);
+                        }}
+                        className="inline-flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-slate-200 active:scale-95 cursor-pointer"
+                        title="Update Password"
+                      >
+                        <KeyRound className="w-3.5 h-3.5 text-slate-500" />
+                        Update PW
+                      </button>
+                    </td>
                   </tr>
                 ))
               )}
@@ -255,6 +325,99 @@ export default function UserManagement() {
           </table>
         </div>
       </div>
+
+      {isResetModalOpen && selectedUser && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">Update User Password</h3>
+                <p className="text-xs text-slate-500">Securely set a new password for the account.</p>
+              </div>
+              <button 
+                onClick={() => {
+                  setIsResetModalOpen(false);
+                  setSelectedUser(null);
+                  setResetPassword("");
+                }}
+                className="p-2 hover:bg-white rounded-full text-slate-400 hover:text-slate-600 transition-colors border border-transparent hover:border-slate-200"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={onResetPasswordSubmit} className="p-6 space-y-5">
+              <div className="bg-slate-50 p-4.5 rounded-xl border border-slate-100 text-sm space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-xs text-slate-500">User:</span>
+                  <span className="font-semibold text-slate-900">{selectedUser.name || "No Name"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-xs text-slate-500">Email/Phone:</span>
+                  <span className="font-mono text-xs text-slate-700">{selectedUser.email || selectedUser.phone}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-xs text-slate-500">Role:</span>
+                  <span className="text-xs text-slate-600 capitalize font-bold">{selectedUser.role || "user"}</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black text-slate-500 uppercase mb-1.5 tracking-wider">New Password</label>
+                <div className="relative">
+                  <input 
+                    type={showResetPassword ? "text" : "password"}
+                    value={resetPassword}
+                    onChange={(e) => setResetPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none pr-11 transition-all"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowResetPassword(!showResetPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 transition-colors rounded-lg"
+                  >
+                    {showResetPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                <p className="text-[10px] text-slate-500 mt-1 font-medium">Minimum of 6 characters required.</p>
+              </div>
+
+              <div className="pt-2 flex gap-3">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => {
+                    setIsResetModalOpen(false);
+                    setSelectedUser(null);
+                    setResetPassword("");
+                  }}
+                  className="flex-1 rounded-xl h-11 font-bold text-slate-600 border-slate-200"
+                  disabled={isResetting}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={isResetting}
+                  className="flex-1 bg-slate-600 hover:bg-slate-700 hover:disabled:bg-slate-500 rounded-xl h-11 font-bold text-white shadow-lg shadow-slate-200 flex justify-center items-center gap-2"
+                >
+                  {isResetting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/60 border-t-white rounded-full animate-spin"></div>
+                      Updating...
+                    </>
+                  ) : (
+                    "Reset Password"
+                  )}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
